@@ -1,4 +1,6 @@
 import scrapy
+from scrapy.loader import ItemLoader
+from varredor_de_sites.items import CitacaoItem
 
 # CamelCase
 class QuotesToScrapeSpider(scrapy.Spider):
@@ -15,14 +17,13 @@ class QuotesToScrapeSpider(scrapy.Spider):
     def parse(self, response):
         # Onde irá processar o que é retornado do response
         for elemento in response.xpath("//div[@class='quote']"):
-            yield {
-                'frase': elemento.xpath(".//span[@class='text']/text()").get(),
-                'autor': elemento.xpath(".//small[@class='author']/text()").get(),
-                'tags': elemento.xpath(".//a[@class='tag']/text()").getall(),
-            }
+            loader = ItemLoader(item=CitacaoItem(),selector=elemento, response=response)
+            loader.add_xpath('frase',".//span[@class='text']/text()")
+            loader.add_xpath('autor',".//small[@class='author']/text()")
+            loader.add_xpath('tags',".//a[@class='tag']/text()")
+            yield loader.load_item()
 
         # Como varrer várias paginas:
-        
         # Tentar encontrar o botão próximo, se encontrar, vou varrer essas páginas
         try:
             link_proxima_pagina = response.xpath("//li[@class='next']/a/@href").get()
