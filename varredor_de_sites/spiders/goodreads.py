@@ -8,7 +8,7 @@ class GoodReadsSpider(scrapy.Spider):
     # Request
     def start_requests(self):
         # Definir urls a varrer
-        urls = ['https://www.goodreads.com/quotes']
+        urls = ['https://www.goodreads.com/quotes?page=1']
 
         for url in urls:
             yield scrapy.Request(url=url,callback=self.parse)
@@ -22,3 +22,21 @@ class GoodReadsSpider(scrapy.Spider):
                 'autor': elemento.xpath(".//span[@class='authorOrTitle']/text()").get(),
                 'tags': elemento.xpath(".//div[@class='greyText smallText left']/a/text()").getall(),
             }
+
+        # try:
+        #     link_proxima_pagina = response.xpath("//a[@class='next_page']/@href").get()
+        #     if link_proxima_pagina is not None: 
+        #         link_proxima_pagina_completo = response.urljoin(link_proxima_pagina)
+        #         yield scrapy.Request(url=link_proxima_pagina_completo,callback=self.parse)
+        # except:
+        #     print("Chegamos a ultima página")
+        numero_proxima_pagina = response.xpath(".//a[@class='next_page']/@href").get().split("=")[1]
+        print('#'*20)
+        print(numero_proxima_pagina)
+        print('#'*20)
+        if numero_proxima_pagina is not None:
+            link_proxima_pagina = f'https://www.goodreads.com/quotes?page={numero_proxima_pagina}'
+            print('#'*20)
+            print(numero_proxima_pagina)
+            print('#'*20)
+            yield scrapy.Request(url=link_proxima_pagina,callback=self.parse)
