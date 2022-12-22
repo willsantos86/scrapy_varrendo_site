@@ -31,7 +31,8 @@ class CitacaoItem(scrapy.Item):
         output_processor=Join(',')
     )
 
-class GoodReads(scrapy.Item):
+
+class CitacaoGoodReadsItem(scrapy.Item):
     frase = scrapy.Field(
         input_processor=MapCompose(
             processar_caracteres_especiais,tira_espaco_em_branco),
@@ -43,7 +44,5 @@ class GoodReads(scrapy.Item):
         output_processor=TakeFirst()
     )
     tags = scrapy.Field(
-        # input_processor=MapCompose(
-        #     mudar_separador)
         output_processor=Join(';')
     )
